@@ -1,1 +1,1 @@
-# Django-Backend-App
+# Django backend application for eagle financial services 
