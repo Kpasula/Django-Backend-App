@@ -1,6 +1,7 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Customer, Investment, Stock
+from rest_framework_jwt.serializers import User
+
+from .models import Customer, Investment, Stock, MutualFund
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -16,16 +17,20 @@ class CustomerSerializer(serializers.ModelSerializer):
 class InvestmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Investment
-        fields = (
-            'pk', 'customer', 'cust_number', 'category', 'description', 'acquired_value', 'acquired_date',
-            'recent_value',
-            'recent_date')
+        fields = ('pk', 'customer', 'cust_number', 'category', 'description', 'acquired_value', 'acquired_date',
+                  'recent_value', 'recent_date')
 
 
 class StockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stock
         fields = ('pk', 'customer', 'cust_number', 'symbol', 'name', 'shares', 'purchase_price', 'purchase_date')
+
+
+class MutualFundSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MutualFund
+        fields = ('pk', 'customer', 'cust_number', 'plan', 'investment_amount', 'current_value', 'acquired_date')
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -52,7 +57,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"password": "Password fields didn't match."})
 
         return attrs
-
 
     def create(self, validated_data):
         user = User.objects.create(

@@ -91,6 +91,48 @@ def getInvestment(request, pk):
         investment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+@csrf_exempt
+@api_view(['GET', 'POST'])
+def mutualfund_list(request):
+    permission_classes = (IsAuthenticatedOrReadOnly)
+    if request.method == 'GET':
+        mutualfund = MutualFund.objects.all()
+        serializer = MutualFundSerializer(mutualfund, context={'request': request}, many=True)
+        return Response({'data': serializer.data})
+
+    elif request.method == 'POST':
+        serializer = MutualFundSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def getMutualFund(request, pk):
+    """
+    Retrieve, update or delete a customer instance.
+    """
+    try:
+        mutualFund = MutualFund.objects.get(pk=pk)
+    except MutualFund.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = MutualFundSerializer(mutualFund, context={'request': request})
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = MutualFundSerializer(mutualFund, data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        mutualFund.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 @csrf_exempt
 @api_view(['GET', 'POST'])
@@ -139,3 +181,4 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
+
